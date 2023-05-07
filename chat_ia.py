@@ -11,5 +11,4 @@ def send_chat_rq(request_text):
     }
     response = requests.post(URL_CHAT, headers=headers, json=payload)
     return response.json().get("choices")[0].get("message").get("content")
-    # return response.json().get("chices")[0].get("message").get("content")
 
