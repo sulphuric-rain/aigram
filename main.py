@@ -71,8 +71,6 @@ async def auth(client):
 async def main():
     client = await init_client("aigram", api_id, api_hash)
     await auth(client)
-    # async with Client("my_account", api_id, api_hash) as app:
-    #     await app.send_message("me", "Hello World")
 
 
 asyncio.run(main())
