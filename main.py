@@ -1,7 +1,10 @@
 import asyncio
-from pyrogram import Client
+from pyrogram import Client, idle
 from pyrogram.errors import Unauthorized, SessionPasswordNeeded, BadRequest
 from pyrogram.types import User, TermsOfService
+from pyrogram.handlers import MessageHandler
+from pyrogram import filters
+
 
 from tgconfig import api_id, api_hash
 
@@ -12,10 +15,19 @@ from tgconfig import api_id, api_hash
 # TODO: * When response from ChatGPT is not yet fulfilled and it not fail/error set Typing status to Resolved User
 # TODO: * When response return from ChatGPT send response.text as Message to Resolved User
 
+USER_POOL = []
 
 
-async def init_client(session_name, api_id, api_hash):
-    client = Client(session_name, api_id, api_hash)
+def filter_message_user_in_pool(filter, client, update):
+    print(update)
+    return True
+
+
+user_pool_filter = filters.create(filter_message_user_in_pool, "UserPoolFilter")
+app = Client("aigram", api_id, api_hash)
+
+
+async def init_client(client):
     await client.connect()
     await client.initialize()
     return client
@@ -68,9 +80,28 @@ async def auth(client):
     print("auth is not needed next...")
 
 
+
+def add_to_user_pool(user):
+    USER_POOL.append(user)
+
+
+def remove_from_user_pool(user):
+    USER_POOL.remove(user)
+
+
+
+async def handle_message(client, message):
+    print(f"From: {message.from_user.first_name}\nText: {message.text}")
+
+
+
 async def main():
-    client = await init_client("aigram", api_id, api_hash)
+    client = await init_client(app)
     await auth(client)
+    app.add_handler(MessageHandler(handle_message))
+    await idle()
 
 
-asyncio.run(main())
+app.run(main())
+
+
