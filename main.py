@@ -8,7 +8,7 @@ from pyrogram.enums import ChatType
 from chat_ia import send_chat_rq
 
 
-from tgconfig import api_id, api_hash
+from tgconfig import api_id, api_hash, USER_POOL
 
 # TODO: * Resolve User by id or username
 # TODO: * Add Resolved User to Set of Resolved Users
@@ -16,8 +16,6 @@ from tgconfig import api_id, api_hash
 # TODO: * On new Message from Resolved User send request to ChatGPT with Message text data
 # TODO: * When response from ChatGPT is not yet fulfilled and it not fail/error set Typing status to Resolved User
 # TODO: * When response return from ChatGPT send response.text as Message to Resolved User
-
-USER_POOL = []
 
 
 def filter_message_user_in_pool(filter, client, update):
