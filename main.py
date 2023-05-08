@@ -1,9 +1,11 @@
 import asyncio
 from pyrogram import Client, idle
 from pyrogram.errors import Unauthorized, SessionPasswordNeeded, BadRequest
-from pyrogram.types import User, TermsOfService
+from pyrogram.types import User, TermsOfService, Message
 from pyrogram.handlers import MessageHandler
 from pyrogram import filters
+from pyrogram.enums import ChatType
+from chat_ia import send_chat_rq
 
 
 from tgconfig import api_id, api_hash
@@ -19,8 +21,11 @@ USER_POOL = []
 
 
 def filter_message_user_in_pool(filter, client, update):
-    print(update)
-    return True
+    if type(update) is Message:
+        if update.from_user.id in USER_POOL and update.chat.type == ChatType.PRIVATE:
+            return True
+        return False
+    return False
 
 
 user_pool_filter = filters.create(filter_message_user_in_pool, "UserPoolFilter")
@@ -82,23 +87,28 @@ async def auth(client):
 
 
 def add_to_user_pool(user):
-    USER_POOL.append(user)
+    USER_POOL.append(user.id)
 
 
 def remove_from_user_pool(user):
-    USER_POOL.remove(user)
+    USER_POOL.remove(user.id)
 
 
 
 async def handle_message(client, message):
+    chat_id = message.from_user.id
+    message_id=message.id
     print(f"From: {message.from_user.first_name}\nText: {message.text}")
+    response_text = send_chat_rq(message.text)
+    await client.send_message(chat_id=chat_id, text=response_text, reply_to_message_id=message_id)
+    await client.read_chat_history(chat_id, message_id)
 
 
 
 async def main():
     client = await init_client(app)
     await auth(client)
-    app.add_handler(MessageHandler(handle_message))
+    app.add_handler(MessageHandler(handle_message, user_pool_filter))
     await idle()
 
 
