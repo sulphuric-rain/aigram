@@ -20,7 +20,7 @@ from tgconfig import api_id, api_hash, USER_POOL
 
 def filter_message_user_in_pool(filter, client, update):
     if type(update) is Message:
-        if update.from_user.id in USER_POOL and update.chat.type == ChatType.PRIVATE:
+        if update.chat.type == ChatType.PRIVATE and update.from_user.id in USER_POOL:
             return True
         return False
     return False
